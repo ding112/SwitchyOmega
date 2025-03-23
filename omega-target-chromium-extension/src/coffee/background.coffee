@@ -212,7 +212,7 @@ options._inspect = new OmegaTargetCurrent.Inspect (url, tab) ->
 
     title = chrome.i18n.getMessage('browserAction_titleInspect', urlDisp) + '\n'
     title += action.title
-    chrome.browserAction.setTitle(title: title, tabId: tab.id)
+    chrome.action.setTitle(title: title, tabId: tab.id)
     tabs.setTabBadge(tab, {
       text: '#'
       color: action.resultColor

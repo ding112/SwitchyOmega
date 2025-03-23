@@ -13,7 +13,7 @@ $script 'lib/spin.js/spin.js', ->
 $script.ready ['angular-loader'], ->
   angular.module 'omega', ['ngLocale', 'ngAnimate', 'ngSanitize',
     'ui.bootstrap', 'ui.router', 'ngProgress', 'ui.sortable',
-    'angularSpectrumColorpicker', 'ui.validate', 'angular-ladda', 'omegaTarget',
+    'ui.validate', 'angular-ladda', 'omegaTarget',
     'omegaDecoration']
   $script.ready ['omega-pac'], ->
     $script 'js/omega.js', 'omega'
@@ -27,7 +27,6 @@ $script.ready ['angular-loader'], ->
     'lib/angular-ui-sortable/sortable.min.js'
     'lib/angular-ui-utils/validate.min.js'
     'lib/jsondiffpatch/jsondiffpatch.min.js'
-    'lib/angular-spectrum-colorpicker/angular-spectrum-colorpicker.min.js'
   ], 'omega-deps')
 $script.ready ['jquery'], ->
   $script 'lib/jquery-ui-1.10.4.custom.min.js', 'jquery-ui-base'

@@ -41,3 +41,21 @@ module.exports =
           []
       browserifyOptions:
         noParse: [require.resolve('omega-pac/omega_pac.min.js')]
+  background_worker:
+    files:
+      'build/js/background_worker.js': 'src/js/background_worker.js'
+    options:
+      plugin:
+        if process.env.BUILD == 'release'
+          [['minifyify', {map: false}]]
+        else
+          []
+  background_adapter:
+    files:
+      'build/js/background_adapter.js': 'src/js/background_adapter.js'
+    options:
+      plugin:
+        if process.env.BUILD == 'release'
+          [['minifyify', {map: false}]]
+        else
+          []
