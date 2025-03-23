@@ -1,3 +1,5 @@
 node_modules
 bower_components
 package-lock.json
+omega-target-chromium-extension/*.zip
+switchyomega-v**.zip

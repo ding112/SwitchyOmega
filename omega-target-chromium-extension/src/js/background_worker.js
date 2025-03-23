@@ -1,14 +1,15 @@
 // Service worker for SwitchyOmega
 // 导入所需的依赖项
 importScripts(
-  'js/log_error.js',
-  'lib/FileSaver/FileSaver.min.js',
-  'js/omega_debug.js',
-  'js/background_adapter.js',
-  'js/omega_pac.min.js',
-  'js/omega_target.min.js',
-  'js/omega_target_chromium_extension.min.js',
-  'img/icons/draw_omega.js'
+  'log_error.js',
+  'filesaver_patch.js',
+  '../lib/FileSaver/FileSaver.min.js',
+  'omega_debug.js',
+  'background_adapter.js',
+  'omega_pac.min.js',
+  'omega_target.min.js',
+  'omega_target_chromium_extension.min.js',
+  '../img/icons/draw_omega.js'
 );
 
 // 创建离屏canvas用于绘制图标
@@ -168,4 +169,4 @@ self.Log = {
 };
 
 // 导入主要后台脚本
-importScripts('js/background.js'); 
+importScripts('background.js'); 

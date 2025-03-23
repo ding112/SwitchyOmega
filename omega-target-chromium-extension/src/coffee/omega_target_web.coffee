@@ -46,7 +46,26 @@ angular.module('omegaTarget', []).factory 'omegaTarget', ($q) ->
   optionsChangeCallback = []
   requestInfoCallback = null
   prefix = 'omega.local.'
-  urlParser = document.createElement('a')
+  
+  # 判断是否在Service Worker环境
+  isServiceWorker = typeof self isnt 'undefined' and
+    not self.document and
+    self.importScripts
+  
+  urlParser = null
+  
+  # 创建URL解析函数
+  parseUrl = (url) ->
+    if isServiceWorker
+      try
+        return new URL(url)
+      catch
+        return null
+    else
+      urlParser = document.createElement('a') unless urlParser?
+      urlParser.href = url
+      return urlParser
+  
   omegaTarget =
     options: null
     state: (name, value) ->
@@ -89,25 +108,38 @@ angular.module('omegaTarget', []).factory 'omegaTarget', ($q) ->
         results
       ).then omegaTarget.refresh
     getMessage: chrome.i18n.getMessage.bind(chrome.i18n)
+    openUrl: (url) ->
+      targetUrl = Url.sanitize(url)
+      return if not targetUrl?
+      chrome.tabs.create {url: targetUrl}
     openOptions: (hash) ->
-      d = $q['defer']()
-      options_url = chrome.extension.getURL('options.html')
-      chrome.tabs.query url: options_url, (tabs) ->
-        url = if hash
-          urlParser.href = tabs[0]?.url || options_url
-          urlParser.hash = hash
-          urlParser.href
-        else
-          options_url
+      options_url = chrome.runtime.getURL('options.html')
+      chrome.tabs.query {
+        url: [
+          'chrome-extension://*/options.html'
+          'chrome-extension://*/options.html#*'
+        ]
+        windowId: chrome.windows.WINDOW_ID_CURRENT
+      }, (tabs) ->
         if tabs.length > 0
-          props = {active: true}
-          if hash
-            props.url = url
-          chrome.tabs.update(tabs[0].id, props)
+          chrome.tabs.update tabs[0].id, {active: true}
+          if hash?
+            if isServiceWorker
+              try
+                urlObj = new URL(tabs[0]?.url || options_url)
+                urlObj.hash = hash
+                chrome.tabs.update tabs[0].id, {url: urlObj.href}
+              catch
+                chrome.tabs.update tabs[0].id, {url: "#{options_url}##{hash}"}
+            else
+              urlParser = document.createElement('a') unless urlParser?
+              urlParser.href = tabs[0]?.url || options_url
+              urlParser.hash = hash
+              chrome.tabs.update tabs[0].id, {url: urlParser.href}
         else
-          chrome.tabs.create({url: url})
-        d.resolve()
-      return d.promise
+          chrome.tabs.create {
+            url: if hash then "#{options_url}##{hash}" else options_url
+          }
     applyProfile: (name) ->
       callBackground('applyProfile', name)
     applyProfileNoReply: (name) ->

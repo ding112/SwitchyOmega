@@ -58,11 +58,5 @@
   "web_accessible_resources": [{
     "resources": ["js/omega_webext_proxy_script.min.js"],
     "matches": ["<all_urls>"]
-  }],
-  "applications": {
-    "gecko": {
-      "id": "switchyomega@feliscatus.addons.mozilla.org",
-      "strict_min_version": "55.0a1"
-    }
-  }
+  }]
 }

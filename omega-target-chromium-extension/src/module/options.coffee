@@ -73,18 +73,7 @@ class ChromeOptions extends OmegaTarget.Options
   _quickSwitchCanEnable: false
   setQuickSwitch: (quickSwitch, canEnable) ->
     @_quickSwitchCanEnable = canEnable
-    if not @_quickSwitchHandlerReady
-      @_quickSwitchHandlerReady = true
-      window.OmegaContextMenuQuickSwitchHandler = (info) =>
-        changes = {}
-        changes['-enableQuickSwitch'] = info.checked
-        setOptions = @_setOptions(changes)
-        if info.checked and not @_quickSwitchCanEnable
-          setOptions.then ->
-            chrome.tabs.create(
-              url: chrome.extension.getURL('options.html#/ui')
-            )
-
+    
     if quickSwitch or not chrome.action.setPopup?
       chrome.action.setPopup?({popup: ''})
       if not @_quickSwitchInit
@@ -110,8 +99,32 @@ class ChromeOptions extends OmegaTarget.Options
     else
       chrome.action.setPopup({popup: 'popup/index.html'})
 
-    chrome.contextMenus?.update('enableQuickSwitch', {checked: !!quickSwitch})
+    @_initQuickSwitch(quickSwitch)
     Promise.resolve()
+
+  _initQuickSwitch: (quickSwitch) ->
+    return if not chrome.contextMenus?
+    try
+      # 确保菜单项存在
+      chrome.contextMenus.create({
+        id: 'enableQuickSwitch'
+        title: chrome.i18n.getMessage('contextMenu_enableQuickSwitch')
+        type: 'checkbox'
+        checked: !!quickSwitch
+        contexts: ["action"]
+      }, ->
+        # 忽略重复创建的错误
+        if chrome.runtime.lastError
+          console.log('Context menu may already exist:', chrome.runtime.lastError.message)
+      )
+      
+      # 更新状态
+      try
+        chrome.contextMenus?.update('enableQuickSwitch', {checked: !!quickSwitch})
+      catch e
+        console.log('Failed to update context menu:', e)
+    catch e
+      console.error('Error handling context menu:', e)
 
   setInspect: (settings) ->
     if @_inspect

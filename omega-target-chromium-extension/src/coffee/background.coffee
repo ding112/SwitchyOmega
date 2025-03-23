@@ -32,43 +32,32 @@ Promise.onPossiblyUnhandledRejection (reason, promise) ->
   unhandledPromisesNextId++
 Promise.onUnhandledRejectionHandled (promise) ->
   index = unhandledPromises.indexOf(promise)
-  Log.log("[#{unhandledPromisesId[index]}] Rejection handled!", promise)
-  unhandledPromises.splice(index, 1)
-  unhandledPromisesId.splice(index, 1)
+  if index >= 0
+    Log.log("[#{unhandledPromisesId[index]}] Rejection handled!", promise)
+    unhandledPromises.splice(index, 1)
+    unhandledPromisesId.splice(index, 1)
+  else
+    Log.log("Rejection handled for unknown promise!", promise)
 
-iconCache = {}
-drawContext = null
 drawError = null
 drawIcon = (resultColor, profileColor) ->
-  cacheKey = "omega+#{resultColor ? ''}+#{profileColor}"
-  icon = iconCache[cacheKey]
-  return icon if icon
+  # 直接使用 OffscreenCanvas 绘制图标
   try
-    if not drawContext?
-      drawContext = document.getElementById('canvas-icon').getContext('2d')
-
-    icon = {}
-    for size in [16, 19, 24, 32, 38]
-      drawContext.scale(size, size)
-      drawContext.clearRect(0, 0, 1, 1)
-      if resultColor?
-        drawOmega drawContext, resultColor, profileColor
-      else
-        drawOmega drawContext, profileColor
-      drawContext.setTransform(1, 0, 0, 1, 0, 0)
-      icon[size] = drawContext.getImageData(0, 0, size, size)
-      if icon[size].data[3] == 255
-        # Some browsers may replace the image data with a opaque white image to
-        # resist fingerprinting. In that case the icon cannot be drawn.
-        throw new Error('Icon drawing blocked by privacy.resistFingerprinting.')
+    # 使用 OffscreenCanvas 创建画布
+    canvas = new OffscreenCanvas(19, 19)
+    ctx = canvas.getContext('2d')
+    # 绘制 Omega 图标
+    drawOmega(ctx, resultColor, profileColor)
+    # 直接设置图标
+    chrome.action?.setIcon? imageData: ctx.getImageData(0, 0, 19, 19)
+    # 返回一个标记对象
+    return {serviceWorker: true}
   catch e
     if not drawError?
       drawError = e
-      Log.error(e)
+      Log.error('Icon drawing error:', e)
       Log.error('Profile-colored icon disabled. Falling back to static icon.')
-    icon = null
-
-  return iconCache[cacheKey] = icon
+    return null
 
 charCodeUnderscore = '_'.charCodeAt(0)
 isHidden = (name) -> (name.charCodeAt(0) == charCodeUnderscore and
@@ -137,18 +126,18 @@ actionForUrl = (url) ->
     resultColor = profile.color
     profileColor = current.color
 
-    icon = null
     if direct
       resultColor = options.profile('direct').color
       profileColor = profile.color
     else if profile.name == current.name and options.isCurrentProfileStatic()
       resultColor = profileColor = profile.color
-      icon = drawIcon(profile.color)
+      # 直接绘制图标
+      drawIcon(profile.color) 
     else
       resultColor = profile.color
       profileColor = current.color
-
-    icon ?= drawIcon(resultColor, profileColor)
+      # 直接绘制图标
+      drawIcon(resultColor, profileColor)
 
     shortTitle = 'Omega: ' + currentName # TODO: I18n.
     if profile.name != currentName
@@ -160,9 +149,7 @@ actionForUrl = (url) ->
         dispName(profile.name)
         details
       ])
-
       shortTitle: shortTitle
-      icon: icon
       resultColor: resultColor
       profileColor: profileColor
     }
@@ -263,7 +250,8 @@ proxyImpl.watchProxyChange (details) ->
 
 external = false
 options.currentProfileChanged = (reason) ->
-  iconCache = {}
+  # 不再需要缓存，因为每次都直接绘制图标
+  # iconCache = {}
 
   if reason == 'external'
     external = true
@@ -283,27 +271,25 @@ options.currentProfileChanged = (reason) ->
   if currentName
     title = chrome.i18n.getMessage('browserAction_titleWithResult', [
       currentName, '', details])
-    shortTitle = 'Omega: ' + currentName # TODO: I18n.
   else
     title = details
-    shortTitle = 'Omega: ' + details # TODO: I18n.
 
   if external and current.profileType != 'SystemProfile'
     message = chrome.i18n.getMessage('browserAction_titleExternalProxy')
     title = message + '\n' + title
-    shortTitle = 'Omega-Extern: ' + details # TODO: I18n.
     options.setBadge()
 
+  # 直接绘制图标
   if not current.name or not OmegaPac.Profiles.isInclusive(current)
-    icon = drawIcon(current.color)
+    drawIcon(current.color)
   else
-    icon = drawIcon(options.profile('direct').color, current.color)
-
-  tabs.resetAll(
-    icon: icon
-    title: title
-    shortTitle: shortTitle
-  )
+    drawIcon(options.profile('direct').color, current.color)
+  
+  # 设置标题
+  try
+    chrome.action?.setTitle?(title: title)
+  catch e
+    Log.error('Error setting action title:', e)
 
 encodeError = (obj) ->
   if obj instanceof Error
@@ -353,11 +339,50 @@ chrome.runtime.onMessage.addListener (request, sender, respond) ->
       if request.method == 'updateProfile'
         for own key, value of result
           result[key] = encodeError(value)
-      respond(result: result)
+      try
+        respond(result: result)
+      catch e
+        # 忽略 "Receiving end does not exist" 错误
+        Log.log('Cannot respond to message, receiver no longer exists.')
 
     promise.catch (error) ->
       Log.error(request.method + ' ==>', error)
-      respond(error: encodeError(error))
+      try
+        respond(error: encodeError(error))
+      catch e
+        # 忽略 "Receiving end does not exist" 错误
+        Log.log('Cannot respond to message, receiver no longer exists.')
 
   # Wait for my response!
   return true unless request.noReply
+
+# 设置快速切换菜单的处理程序
+handleQuickSwitchMenu = (info) ->
+  return unless info
+  if info.menuItemId == 'enableQuickSwitch'
+    changes = {}
+    changes['-enableQuickSwitch'] = info.checked
+    Log.log('Quick switch ' + (if info.checked then 'enabled' else 'disabled'))
+    
+    # 应用更改
+    setOptions = options.applyPatch(changes)
+    
+    # 如果启用了快速切换但没有配置，打开设置页面
+    if info.checked and not options._quickSwitchCanEnable
+      setOptions.then ->
+        chrome.tabs.create(
+          url: chrome.runtime.getURL('options.html#/ui')
+        )
+
+# 根据环境设置全局变量 (为了向后兼容)
+if typeof self isnt 'undefined' and not self.document and self.importScripts
+  # Service Worker 环境
+  self.OmegaContextMenuQuickSwitchHandler = handleQuickSwitchMenu
+else
+  # 传统环境
+  window.OmegaContextMenuQuickSwitchHandler = handleQuickSwitchMenu
+
+# 监听上下文菜单点击事件，这才是在Manifest V3中的正确方法
+chrome.contextMenus?.onClicked?.addListener (info) ->
+  if info.menuItemId == 'enableQuickSwitch'
+    handleQuickSwitchMenu(info)
