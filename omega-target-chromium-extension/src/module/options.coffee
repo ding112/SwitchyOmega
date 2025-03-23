@@ -143,8 +143,20 @@ class ChromeOptions extends OmegaTarget.Options
       @_tabRequestInfoPorts = {}
       wildcardForReq = (req) -> OmegaPac.wildcardForUrl(req.url)
       @_requestMonitor = new WebRequestMonitor(wildcardForReq)
+      
+      # 初始化 tabInfo 结构
+      @_requestMonitor.tabInfo ?= {}
+      
       @_requestMonitor.watchTabs (tabId, info) =>
         return unless @_monitorWebRequests
+        
+        # 确保 tabInfo 中存在此标签页
+        @_requestMonitor.tabInfo[tabId] ?= {}
+        
+        # 更新错误计数
+        if info.errorCount?
+          @_requestMonitor.tabInfo[tabId].errorCount = info.errorCount
+          
         if info.errorCount > 0
           info.badgeSet = true
           badge = {text: info.errorCount.toString(), color: '#f0ad4e'}
@@ -255,14 +267,19 @@ class ChromeOptions extends OmegaTarget.Options
     chrome.tabs.create url: chrome.extension.getURL('options.html')
 
   getPageInfo: ({tabId, url}) ->
-    errorCount = @_requestMonitor?.tabInfo[tabId]?.errorCount
+    # 添加更多的空检查
+    errorCount = null
+    if @_requestMonitor? and @_requestMonitor.tabInfo? and tabId?
+      errorCount = @_requestMonitor.tabInfo[tabId]?.errorCount
+    
     result = if errorCount then {errorCount: errorCount} else null
+    
     getBadge = new Promise (resolve, reject) ->
-      if not chrome.action.getBadgeText?
+      if not chrome.action?.getBadgeText?
         resolve('')
         return
       chrome.action.getBadgeText {tabId: tabId}, (result) ->
-        resolve(result)
+        resolve(result || '')
 
     getInspectUrl = @_state.get({inspectUrl: ''})
     Promise.join getBadge, getInspectUrl, (badge, {inspectUrl}) =>

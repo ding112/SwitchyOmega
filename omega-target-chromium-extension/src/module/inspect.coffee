@@ -27,7 +27,6 @@ module.exports = class Inspect
       id: 'inspectPage'
       title: chrome.i18n.getMessage('contextMenu_inspectPage')
       contexts: ['page']
-      onclick: @inspect.bind(this)
       documentUrlPatterns: webResource
     })
     ###
@@ -36,7 +35,6 @@ module.exports = class Inspect
       id: 'inspectFrame'
       title: chrome.i18n.getMessage('contextMenu_inspectFrame')
       contexts: ['frame']
-      onclick: @inspect.bind(this)
       documentUrlPatterns: webResource
     })
 
@@ -44,7 +42,6 @@ module.exports = class Inspect
       id: 'inspectLink'
       title: chrome.i18n.getMessage('contextMenu_inspectLink')
       contexts: ['link']
-      onclick: @inspect.bind(this)
       targetUrlPatterns: webResource
     })
 
@@ -56,9 +53,13 @@ module.exports = class Inspect
         'video'
         'audio'
       ]
-      onclick: @inspect.bind(this)
       targetUrlPatterns: webResource
     })
+    
+    # 使用 onClicked 事件监听器处理菜单点击
+    chrome.contextMenus.onClicked.addListener (info, tab) =>
+      if info.menuItemId in ['inspectFrame', 'inspectLink', 'inspectElement']
+        @inspect(info, tab)
 
     @_enabled = true
 

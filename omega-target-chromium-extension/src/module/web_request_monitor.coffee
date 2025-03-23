@@ -8,6 +8,8 @@ module.exports = class WebRequestMonitor
     @_recentRequests = {}
     @watching = false
     @_timer = -1
+    @_tabsInfo = {}
+    @tabInfo = @_tabsInfo  # 添加 tabInfo 作为 _tabsInfo 的别名
 
   watch: (callback) ->
     @_callbacks.push(callback) if callback?
@@ -130,7 +132,6 @@ module.exports = class WebRequestMonitor
     return if @tabsWatching
     @tabsWatching = true
 
-    @_tabsInfo = {}
     @_activeTabId = -1
     @_topFrame = {}
     @_topFrameDetails = {}
@@ -184,7 +185,7 @@ module.exports = class WebRequestMonitor
     return unless info?
     for callback in @_tabCallbacks
       try
-        callback(info)
+        callback(@_activeTabId, info)
       catch e
         console.error(e)
     return
