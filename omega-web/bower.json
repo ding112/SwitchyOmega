@@ -34,7 +34,6 @@
     "ngprogress": "~1.0.4",
     "angular-ui-sortable": "~0.13.3",
     "jsondiffpatch": "~0.1.7",
-    "angular-spectrum-colorpicker": "~1.3.5",
     "blob": "*",
     "FileSaver": "=1.3.3",
     "angular-ui-utils": "bower-validate",
@@ -77,9 +76,6 @@
     },
     "angular-sanitize": {
       "": "*.min.js"
-    },
-    "angular-spectrum-colorpicker": {
-      "": "dist/*.min.js"
     },
     "angular-ui-router": {
       "": "release/*.min.js"

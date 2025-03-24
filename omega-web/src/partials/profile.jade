@@ -24,7 +24,7 @@
   span.profile-color-editor
     .profile-color-editor-fake(ng-if='profile.profileType == "VirtualProfile"'
       ng-style="{'background-color': getProfileColor()}")
-    x-spectrum-colorpicker(ng-model='profile.color' options='spectrumOptions'
+    input.form-control(type="color" ng-model='profile.color'
       ng-if='profile.profileType != "VirtualProfile"')
   h2.profile-name {{'options_profileTabPrefix' | tr}}{{profile.name}}
 section.settings-group(ng-show='profile.syncOptions == "disabled"')
