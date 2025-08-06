@@ -1,0 +1,40 @@
+---
+globs: Gruntfile.coffee,grunt/**/*.coffee,package.json,bower.json
+---
+# 构建系统规范
+
+## Grunt 配置
+- Gruntfile 使用 CoffeeScript 编写
+- 任务配置分离到 `grunt/` 目录
+- 使用 `load-grunt-config` 自动加载任务
+
+## 构建步骤
+1. 安装依赖：`npm run deps` (在 omega-build 目录)
+2. 开发模式：`npm run dev`
+3. 构建项目：`grunt`
+4. 监视模式：`grunt watch`
+
+## 主要构建任务
+- **coffee**: 编译 CoffeeScript 到 JavaScript
+- **browserify**: 打包 CommonJS 模块
+- **jade**: 编译 Jade 模板到 HTML
+- **less**: 编译 LESS 到 CSS
+- **copy**: 复制静态资源
+- **compress**: 打包扩展为 CRX/ZIP
+
+## 模块间依赖
+- omega-pac 是独立模块，可单独发布
+- omega-target 依赖 omega-pac
+- omega-web 依赖 omega-pac
+- omega-target-chromium-extension 依赖所有模块
+
+## 版本要求
+- npm >= 2.0 (重要！)
+- grunt-cli@1.2.0
+- Node.js 兼容版本
+
+## 开发工作流
+1. 修改源代码
+2. Grunt watch 自动编译
+3. 浏览器重新加载扩展测试
+4. 提交前运行完整构建确保无误

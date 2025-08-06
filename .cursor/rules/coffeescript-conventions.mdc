@@ -1,0 +1,44 @@
+---
+globs: *.coffee
+---
+# CoffeeScript 编码规范
+
+## 缩进和格式
+- 使用 2 个空格进行缩进
+- 不使用分号
+- 对象字面量使用缩进对齐
+
+## 命名约定
+- 类名使用 PascalCase (如 `OmegaTarget`, `PacGenerator`)
+- 方法和变量使用 camelCase
+- 常量使用 UPPER_SNAKE_CASE
+- 私有方法前加下划线 `_privateMethod`
+
+## 函数定义
+- 优先使用箭头函数 `=>` 保持 `this` 上下文
+- 参数较多时使用对象解构
+
+```coffee
+# 推荐
+processProfile: ({name, profileType, color}) =>
+  # 处理逻辑
+
+# 避免
+processProfile: (name, profileType, color) ->
+  # 处理逻辑
+```
+
+## 类定义
+- 使用 CoffeeScript 的类语法
+- 构造函数中初始化所有实例变量
+- 静态方法使用 `@` 前缀
+
+## 模块导出
+- 使用 CommonJS 风格的 `module.exports`
+- 导出单个类或对象时直接赋值
+- 导出多个时使用对象字面量
+
+## 注释规范
+- 函数和类使用块注释说明用途
+- 复杂逻辑使用行内注释
+- TODO 和 FIXME 需标明作者和日期

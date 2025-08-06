@@ -1,0 +1,72 @@
+---
+description: SwitchyOmega 项目贡献指南和代码审查标准
+---
+# 贡献指南
+
+## 提交代码前检查清单
+- [ ] 代码通过 CoffeeLint 检查
+- [ ] 所有测试通过
+- [ ] 新功能包含测试用例
+- [ ] 更新相关文档
+- [ ] 提交信息清晰描述更改
+
+## Git 工作流
+1. Fork 项目到个人仓库
+2. 创建功能分支: `git checkout -b feature/your-feature`
+3. 提交更改: `git commit -am 'Add some feature'`
+4. 推送分支: `git push origin feature/your-feature`
+5. 创建 Pull Request
+
+## 提交信息规范
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+类型:
+- feat: 新功能
+- fix: 修复 bug
+- docs: 文档更新
+- style: 代码格式（不影响功能）
+- refactor: 重构
+- test: 测试相关
+- chore: 构建过程或辅助工具
+
+## 代码审查标准
+### 功能性
+- 代码实现预期功能
+- 边界情况处理得当
+- 向后兼容性
+
+### 代码质量
+- 遵循项目编码规范
+- 代码可读性和可维护性
+- 适当的注释和文档
+
+### 性能
+- 无明显性能退化
+- 大数据集处理效率
+- 内存使用合理
+
+### 安全性
+- 输入验证
+- XSS 防护
+- 权限检查
+
+## Issue 管理
+使用 Issue 模板提交问题
+- 提供 SwitchyOmega 版本
+- 浏览器版本和操作系统
+- 详细复现步骤
+- 期望行为 vs 实际行为
+
+## 开发环境设置
+1. 克隆仓库
+2. 安装 Node.js 和 npm 2.x
+3. 运行 `npm run deps` 安装依赖
+4. 运行 `npm run dev` 设置开发环境
+5. 运行 `grunt` 构建项目
+6. 加载 `omega-chromium-extension/build/` 为未打包扩展

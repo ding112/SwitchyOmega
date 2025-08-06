@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+# SwitchyOmega 项目结构指南
+
+## 项目概述
+SwitchyOmega 是一个用于管理和切换多个代理的浏览器扩展项目。支持 Chromium 和 Firefox 浏览器。
+
+## 核心模块结构
+- **omega-pac**: PAC 生成模块，处理配置文件模型并编译成 PAC 脚本
+- **omega-target**: 浏览器无关的选项管理和配置应用逻辑
+- **omega-web**: 基于 AngularJS 的 Web 配置界面
+- **omega-target-chromium-extension**: Chromium/Firefox 浏览器扩展实现
+- **omega-build**: 构建系统配置
+- **omega-locales**: 多语言翻译文件
+
+## 主要技术栈
+- CoffeeScript 作为主要开发语言
+- AngularJS 1.x 用于 Web 界面
+- Grunt 作为构建工具
+- Bower 管理前端依赖
+- npm 2.x 管理项目依赖
+
+## 关键文件位置
+- 扩展清单: [omega-target-chromium-extension/overlay/manifest.json](mdc:omega-target-chromium-extension/overlay/manifest.json)
+- 背景页面: [omega-target-chromium-extension/src/coffee/background.coffee](mdc:omega-target-chromium-extension/src/coffee/background.coffee)
+- 选项页面入口: [omega-web/src/coffee/options.coffee](mdc:omega-web/src/coffee/options.coffee)
+- 弹出页面: [omega-web/src/coffee/popup.coffee](mdc:omega-web/src/coffee/popup.coffee)

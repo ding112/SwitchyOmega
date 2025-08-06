@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SwitchyOmega Offscreen</title>
+</head>
+<body>
+  <canvas id="canvas-icon" width="19" height="19"></canvas>
+  
+  <script src="js/log_error.js"></script>
+  <script src="img/icons/draw_omega.js"></script>
+  <script>
+    // 处理来自 Service Worker 的请求
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.type === 'draw-icon') {
+        try {
+          const canvas = document.getElementById('canvas-icon');
+          const ctx = canvas.getContext('2d');
+          
+          // 清空画布
+          ctx.clearRect(0, 0, 19, 19);
+          
+          // 使用现有的绘图函数
+          if (typeof drawOmega !== 'undefined') {
+            drawOmega(ctx, request.color, request.text);
+          }
+          
+          // 获取图像数据
+          canvas.toBlob((blob) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              sendResponse({ 
+                success: true, 
+                dataUrl: reader.result 
+              });
+            };
+            reader.readAsDataURL(blob);
+          });
+          
+        } catch (error) {
+          console.error('Offscreen drawing error:', error);
+          sendResponse({ 
+            success: false, 
+            error: error.message 
+          });
+        }
+        
+        return true; // 异步响应
+      }
+    });
+    
+    console.log('SwitchyOmega Offscreen Document ready');
+  </script>
+</body>
+</html>

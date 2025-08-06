@@ -26,3 +26,14 @@ module.exports =
     cwd: '..'
     src: ['COPYING', 'AUTHORS']
     dest: 'build/'
+  v3_adapter:
+    files: [
+      {
+        src: 'src/js/background_v3_adapter.js'
+        dest: 'build/js/background_adapter.js'
+      }
+      {
+        src: 'overlay/offscreen.html'
+        dest: 'build/offscreen.html'
+      }
+    ]

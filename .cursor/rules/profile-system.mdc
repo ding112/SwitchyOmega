@@ -1,0 +1,61 @@
+---
+description: SwitchyOmega 配置文件系统架构和实现指南
+---
+# 配置文件（Profile）系统
+
+## 配置文件类型
+定义在 [omega-pac/src/profiles.coffee](mdc:omega-pac/src/profiles.coffee)
+
+### 1. DirectProfile（直接连接）
+- 不使用任何代理，直接连接
+- 系统默认配置
+
+### 2. FixedProfile（固定代理）
+- 单一代理服务器配置
+- 支持 HTTP/HTTPS/SOCKS4/SOCKS5
+- 支持认证
+
+### 3. PacProfile（PAC 脚本）
+- 使用 PAC (Proxy Auto-Config) 脚本
+- 支持本地文件或远程 URL
+- 自动更新机制
+
+### 4. SwitchProfile（情景模式）
+- 根据规则切换不同配置
+- 支持域名、URL、IP 匹配
+- 通配符和正则表达式
+
+### 5. RuleListProfile（规则列表）
+- 导入外部规则列表（如 GFWList）
+- 自动更新和缓存
+- 支持 AutoProxy 格式
+
+### 6. VirtualProfile（虚拟配置）
+- 系统内置配置
+- 如 [系统代理]、[直接连接]
+
+## 配置存储结构
+```javascript
+{
+  "+Profile": {
+    name: "配置名称",
+    profileType: "FixedProfile|PacProfile|...",
+    color: "#颜色代码",
+    revision: "修订版本号",
+    // 类型特定字段...
+  }
+}
+```
+
+## 规则匹配系统
+- **HostWildcardCondition**: 域名通配符匹配
+- **UrlWildcardCondition**: URL 通配符匹配
+- **UrlRegexCondition**: URL 正则匹配
+- **IpCondition**: IP 地址匹配
+- **FalseCondition**: 永不匹配
+
+## 配置应用流程
+1. 用户选择或规则触发配置切换
+2. 编译配置为 PAC 脚本或代理设置
+3. 通过 Chrome API 应用到浏览器
+4. 更新图标和状态显示

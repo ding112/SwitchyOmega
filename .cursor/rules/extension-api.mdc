@@ -1,0 +1,47 @@
+---
+globs: omega-target-chromium-extension/**/*.coffee
+---
+# 浏览器扩展 API 使用规范
+
+## Chrome API 封装
+API 封装位于 [omega-target-chromium-extension/src/module/chrome_api.coffee](mdc:omega-target-chromium-extension/src/module/chrome_api.coffee)
+- 使用 Promise 包装回调式 API
+- 处理 Chrome 和 Firefox 的 API 差异
+- 错误处理和降级方案
+
+## 核心 API 使用
+### proxy API
+- 使用 `chrome.proxy.settings` 管理代理设置
+- PAC 脚本通过 `chrome.proxy.settings.set` 应用
+- 监听 `chrome.proxy.onProxyError` 处理错误
+
+### storage API
+- 使用 `chrome.storage.sync` 同步用户配置
+- 使用 `chrome.storage.local` 存储大数据
+- 实现 [BrowserStorage](mdc:omega-target/src/browser_storage.coffee) 抽象层
+
+### webRequest API
+- 监控请求用于显示当前使用的代理
+- 不修改请求，仅用于状态显示
+- 注意性能影响
+
+### tabs API
+- 获取当前标签页信息
+- 根据 URL 自动切换配置文件
+
+## 背景页面架构
+主入口: [background.coffee](mdc:omega-target-chromium-extension/src/coffee/background.coffee)
+- 初始化选项管理器
+- 设置代理
+- 处理浏览器动作和菜单
+- 管理外部消息通信
+
+## 消息通信
+- 使用 `chrome.runtime.sendMessage` 内部通信
+- 使用 `chrome.runtime.onMessageExternal` 外部 API
+- 消息格式遵循统一协议
+
+## 权限最小化原则
+- 仅申请必要权限
+- 可选权限动态申请
+- 说明每个权限用途

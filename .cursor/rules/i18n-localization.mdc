@@ -1,0 +1,53 @@
+---
+globs: omega-locales/**/*.po,_locales/**/*.json
+---
+# 国际化和本地化规范
+
+## 翻译文件组织
+- PO 文件位于 [omega-locales/](mdc:omega-locales/) 目录
+- 每种语言一个子目录，如 `zh_CN/`, `en_US/`
+- 主翻译文件: `omega-web.po`
+
+## 支持的语言
+- 简体中文 (zh_CN)
+- 繁体中文 (zh_TW, zh_Hant)
+- 英语 (en_US)
+- 日语 (ja)
+- 法语 (fr)
+- 德语 (de)
+- 西班牙语 (es)
+- 以及其他 20+ 种语言
+
+## 翻译工作流
+1. 使用 Weblate 在线翻译平台
+2. 自动同步到 GitHub
+3. 构建时通过 grunt-po2crx 转换为 Chrome 格式
+
+## 消息 ID 命名规范
+- 使用描述性名称，如 `options_profileName`
+- 按功能模块分组
+- 避免使用数字或无意义的 ID
+
+## 在代码中使用
+### AngularJS 模板
+```jade
+// 使用 Angular 翻译过滤器
+span(ng-bind="'options_profileName' | tr")
+```
+
+### JavaScript/CoffeeScript
+```coffee
+# 使用 chrome.i18n API
+chrome.i18n.getMessage('options_profileName')
+```
+
+## 占位符处理
+- 使用 `$1`, `$2` 等作为占位符
+- 在 PO 文件中保持占位符顺序
+- 提供清晰的翻译注释
+
+## 注意事项
+- 保持原文简洁明了
+- 考虑不同语言的文本长度
+- UI 元素需考虑文本膨胀
+- 专业术语保持一致性

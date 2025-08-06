@@ -55,11 +55,5 @@
         "default": "Alt+Shift+O"
       }
     }
-  },
-  "applications": {
-    "gecko": {
-      "id": "switchyomega@feliscatus.addons.mozilla.org",
-      "strict_min_version": "55.0a1"
-    }
   }
 }

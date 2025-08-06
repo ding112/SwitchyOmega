@@ -1,0 +1,44 @@
+---
+globs: omega-web/src/**/*.coffee,omega-web/src/**/*.jade
+---
+# AngularJS 1.x 开发规范
+
+## 模块组织
+- 主模块名称: `omega`
+- 依赖模块包括: `ngLocale`, `ngAnimate`, `ui.bootstrap`, `ui.router` 等
+- 目标平台模块: `omegaTarget`
+- 装饰模块: `omegaDecoration`
+
+## 控制器规范
+控制器位于 [omega-web/src/omega/controllers/](mdc:omega-web/src/omega/controllers/)
+- 使用 controllerAs 语法
+- 控制器命名: `ProfileCtrl`, `MasterCtrl` 等
+- 避免在控制器中直接操作 DOM
+
+## 指令规范
+指令定义在 [omega-web/src/omega/directives.coffee](mdc:omega-web/src/omega/directives.coffee)
+- 使用隔离作用域
+- 指令名使用 camelCase，在 HTML 中转为 kebab-case
+- 优先使用元素或属性指令
+
+## 服务规范
+- 单例服务使用 factory 或 service
+- 配置服务使用 provider
+- 避免使用 $rootScope
+
+## 路由配置
+使用 ui-router 进行状态管理
+- 状态名使用点分隔的层级结构
+- URL 使用 RESTful 风格
+- 使用 resolve 预加载数据
+
+## 模板规范
+模板文件使用 Jade (现 Pug) 格式
+- 位于 [omega-web/src/partials/](mdc:omega-web/src/partials/)
+- 使用 Angular 内置指令
+- 避免在模板中写复杂逻辑
+
+## 数据绑定
+- 使用单向绑定 `::` 优化性能
+- 避免深度监听 `$watch`
+- 使用 `ng-model-options` 控制更新时机

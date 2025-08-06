@@ -1,0 +1,56 @@
+---
+description: SwitchyOmega 常见开发任务和操作指南
+---
+# 常见开发任务
+
+## 添加新的配置文件类型
+1. 在 [omega-pac/src/profiles.coffee](mdc:omega-pac/src/profiles.coffee) 定义新类
+2. 继承自 `Profile` 基类
+3. 实现必需方法: `toJSON`, `fromJSON`, `compile`
+4. 在 [omega-web/src/partials/](mdc:omega-web/src/partials/) 添加 UI 模板
+5. 在控制器中添加处理逻辑
+
+## 添加新的条件类型
+1. 在 [omega-pac/src/conditions.coffee](mdc:omega-pac/src/conditions.coffee) 定义条件类
+2. 实现 `match` 方法
+3. 添加序列化/反序列化支持
+4. 更新 UI 以支持新条件类型
+
+## 修改代理协议支持
+1. 更新 [omega-target-chromium-extension/src/module/proxy/](mdc:omega-target-chromium-extension/src/module/proxy/)
+2. 修改 PAC 脚本生成逻辑
+3. 更新固定代理服务器 UI
+4. 添加协议验证
+
+## 添加新语言支持
+1. 在 [omega-locales/](mdc:omega-locales/) 创建语言目录
+2. 复制 `en_US/LC_MESSAGES/omega-web.po` 作为模板
+3. 翻译所有消息
+4. 更新 manifest.json 的 `_locales`
+5. 测试 UI 文本显示
+
+## 优化启动性能
+1. 延迟加载非关键模块
+2. 使用 chrome.storage 缓存
+3. 优化 PAC 脚本生成
+4. 减少初始化时的 API 调用
+
+## 调试内存泄漏
+1. 使用 Chrome DevTools Memory Profiler
+2. 检查事件监听器清理
+3. 验证 AngularJS 作用域销毁
+4. 监控背景页面内存使用
+
+## 更新依赖库
+1. 检查 package.json 中的版本
+2. 运行 `npm update` (谨慎操作)
+3. 测试所有功能
+4. 更新相关代码以适配新版本
+
+## 发布新版本
+1. 更新 manifest.json 版本号
+2. 更新 CHANGELOG
+3. 运行完整测试套件
+4. 构建生产版本: `grunt build`
+5. 创建 GitHub Release
+6. 上传到 Chrome Web Store 和 AMO

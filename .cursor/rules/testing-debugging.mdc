@@ -1,0 +1,61 @@
+---
+description: SwitchyOmega 测试和调试指南
+---
+# 测试和调试指南
+
+## 单元测试
+测试文件位于各模块的 `test/` 目录
+- 使用 Mocha 测试框架
+- Chai 断言库
+- 运行测试: `grunt mochaTest`
+
+## 测试覆盖的模块
+- **omega-pac**: PAC 生成和规则匹配
+- **omega-target**: 选项管理和同步
+- 条件匹配算法
+- 配置文件转换
+
+## 调试技巧
+
+### 1. 背景页面调试
+- Chrome: 扩展管理页面 → 背景页
+- Firefox: about:debugging → 检查
+- 使用 `console.log` 和断点
+
+### 2. 选项页面调试
+- 直接 F12 打开开发者工具
+- Angular 调试: 使用 Angular DevTools
+- 检查作用域: `angular.element($0).scope()`
+
+### 3. PAC 脚本调试
+- 使用 omega_debug 模块记录日志
+- chrome://net-internals/#proxy 查看代理日志
+- 测试 PAC 函数: `FindProxyForURL(url, host)`
+
+### 4. 存储调试
+- chrome.storage.local.get(console.log)
+- chrome.storage.sync.get(console.log)
+- 监听存储变化事件
+
+## 常见问题排查
+
+### 代理不生效
+1. 检查扩展权限
+2. 查看 PAC 脚本是否正确生成
+3. 确认其他扩展无冲突
+
+### 配置丢失
+1. 检查存储配额
+2. 验证同步状态
+3. 查看浏览器控制台错误
+
+### 性能问题
+1. 分析 PAC 脚本复杂度
+2. 检查规则数量
+3. 使用 Chrome DevTools Performance
+
+## 开发建议
+- 启用详细日志: `Log.setDefaultLevel('debug')`
+- 使用源映射调试 CoffeeScript
+- 保持测试用例更新
+- 记录复现步骤
